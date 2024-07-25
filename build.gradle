@@ -38,6 +38,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
 /// 추가 부분 시작(맨 윗줄 1개 제외)
 // React build 설정
 def reactAppDir = "$projectDir/src/main/reactjs"
@@ -77,7 +78,8 @@ task buildReact(type: Exec) {
 }
 
 task installReact(type: Exec) {
-    workingDir "$reactAppDir"
+ 	workingDir 'src/main/reactjs'
+    //workingDir "$reactAppDir"
     inputs.dir "$reactAppDir"
     group = BasePlugin.BUILD_GROUP
     if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {

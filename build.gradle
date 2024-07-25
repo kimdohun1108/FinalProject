@@ -78,8 +78,8 @@ task buildReact(type: Exec) {
 }
 
 task installReact(type: Exec) {
- 	workingDir 'src/main/reactjs'
-    //workingDir "$reactAppDir"
+ 	//workingDir 'src/main/reactjs'
+    workingDir "$reactAppDir"
     inputs.dir "$reactAppDir"
     group = BasePlugin.BUILD_GROUP
     if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {

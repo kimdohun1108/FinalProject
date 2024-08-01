@@ -1,8 +1,8 @@
 import {
-    //LocalVideoTrack,
-    //RemoteParticipant,
-    //RemoteTrack,
-    //RemoteTrackPublication,
+    LocalVideoTrack,
+    RemoteParticipant,
+    RemoteTrack,
+    RemoteTrackPublication,
     Room,
     RoomEvent
 } from "livekit-client";

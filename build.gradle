@@ -67,14 +67,15 @@ task copyReactFile(type: Copy) {
 }
 
 task buildReact(type: Exec) {
-    dependsOn "installReact"
-    workingDir "$reactAppDir"
-    inputs.dir "$reactAppDir"
-    group = BasePlugin.BUILD_GROUP
+    dependsOn "installReact" // installReact 태스크가 먼저 실행되도록 설정
+    workingDir "$reactAppDir" // React 애플리케이션의 디렉토리
+    inputs.dir "$reactAppDir" // 입력 디렉토리 설정
+    group = BasePlugin.BUILD_GROUP // 태스크 그룹 설정
+     // 운영 체제에 따라 적절한 명령어를 선택
     if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine "npm.cmd", "run-script", "build"
+        commandLine "npm.cmd", "run-script", "build" // Windows에서의 명령어
     } else {
-        commandLine "npm", "run-script", "build"
+        commandLine "npm", "run-script", "build" // Unix 기반 시스템에서의 명령어
     }
 }
 

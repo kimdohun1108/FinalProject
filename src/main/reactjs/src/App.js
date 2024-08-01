@@ -21,8 +21,8 @@ configureUrls();
 function configureUrls() {
     // 로컬 개발을 위한 URL 구성
     if (window.location.hostname === "localhost") {
-        APPLICATION_SERVER_URL = "http://localhost:6080/";
-        LIVEKIT_URL = "ws://localhost:7880/";
+        APPLICATION_SERVER_URL = "http://223.130.139.215:6080/";
+        LIVEKIT_URL = "ws://223.130.139.215:7880/";
     } else {
         // 프로덕션을 위한 URL 구성
         APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";

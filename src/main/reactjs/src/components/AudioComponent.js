@@ -18,4 +18,3 @@ function AudioComponent({ track }) {
 }
 
 export default AudioComponent;
-

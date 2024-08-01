@@ -11,6 +11,7 @@ import { useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
 
+
 // 로컬 개발을 위한 기본값 설정
 // 프로덕션에서는 배포에 따라 올바른 URL을 구성해야 합니다
 let APPLICATION_SERVER_URL = "";

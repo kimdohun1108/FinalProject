@@ -20,15 +20,30 @@ configureUrls();
 
 function configureUrls() {
     // 로컬 개발을 위한 URL 구성
-    if (window.location.hostname === "localhost") {
-        APPLICATION_SERVER_URL = "http://223.130.139.215:6080/";
-        LIVEKIT_URL = "ws://223.130.139.215:7880/";
-    } else {
-        // 프로덕션을 위한 URL 구성
-        APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
-        LIVEKIT_URL = "wss://" + window.location.hostname + ":7443/";
-    }
+    // 프로덕션을 위한 URL 구성
+    APPLICATION_SERVER_URL = "http://localhost:6080/";
+    LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
 }
+
+// function configureUrls() {
+//     // If APPLICATION_SERVER_URL is not configured, use default value from OpenVidu Local deployment
+//     if (!APPLICATION_SERVER_URL) {
+//         if (window.location.hostname === "localhost") {
+//             APPLICATION_SERVER_URL = "http://localhost:6080/";
+//         } else {
+//             APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
+//         }
+//     }
+
+//     // If LIVEKIT_URL is not configured, use default value from OpenVidu Local deployment
+//     if (!LIVEKIT_URL) {
+//         if (window.location.hostname === "localhost") {
+//             LIVEKIT_URL = "ws://localhost:7880/";
+//         } else {
+//             LIVEKIT_URL = "wss://" + window.location.hostname + ":7443/";
+//         }
+//     }
+// }
 
 function App() {
     const [room, setRoom] = useState(undefined);
@@ -67,9 +82,16 @@ function App() {
             // LiveKit URL과 토큰으로 방에 연결
             await room.connect(LIVEKIT_URL, token);
 
-             // 카메라와 마이크 출판
+            // 카메라와 마이크 활성화
             await room.localParticipant.enableCameraAndMicrophone();
-            setLocalTrack(room.localParticipant.videoTrackPublications.values().next().value.videoTrack);
+            // 로컬 비디오 트랙 가져오기
+            //setLocalTrack(room.localParticipant.videoTrackPublications.values().next().value.videoTrack);
+            const LocalVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
+            if (LocalVideoTrack) {
+                setLocalTrack(LocalVideoTrack);
+            } else {
+                console.warn("No video track found for local participant.");
+            }
         } catch (error) {
             console.log("There was an error connecting to the room:", error.message);
             await leaveRoom();
@@ -99,24 +121,30 @@ function App() {
      */
 
     async function getToken(roomName, participantName) {
-        const response = await fetch(APPLICATION_SERVER_URL + "token", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                roomName: roomName,
-                participantName: participantName
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
+        try {
+            const response = await fetch(APPLICATION_SERVER_URL + "token", {
+                method: "POST",
+                //url: "http://localhost:6080",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    roomName: roomName,
+                    participantName: participantName
+                })
+            });
+    
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
+            }
+    
+            const data = await response.json();
+            return data.token;
+        } catch (error) {
+            console.error("토큰 가져오기 실패:", error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data.token;
     }
 
     return (

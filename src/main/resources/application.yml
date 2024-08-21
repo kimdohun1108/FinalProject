@@ -6,6 +6,6 @@ server:
 # LiveKit configuration
 livekit:
   api:
-    key: ${LIVEKIT_API_KEY:devkey}
-    secret: ${LIVEKIT_API_SECRET:secret}
+    key: ${LIVEKIT_API_KEY:APIgu2Y3jMW8rUD}
+    secret: ${LIVEKIT_API_SECRET:j4aEwDCtZejT2d5s8d9HprQtinKDFMoHkQhOxPjRegN}
     

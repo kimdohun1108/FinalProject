@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**") // 모든 엔드포인트에서 CORS 설정
-				.allowedOrigins("http://localhost:3000") //react 주소
+				.allowedOrigins("https://223.130.139.215:3000") //react 주소
 				.allowedMethods("GET","POST","PUT","DELETE","OPTIONS")// 허용할 HTTP 메서드
 				.allowedHeaders("*") //적용할 헤더
 				.allowCredentials(true);

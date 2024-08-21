@@ -24,7 +24,7 @@ function configureUrls() {
     APPLICATION_SERVER_URL = "https://223.130.139.215:6443/";
     LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
 }
-// 로컬이면 6080, 배포면 6443
+// 로컬이면 6080 http, 배포면 6443 https,
 
 // function configureUrls() {
 //     // If APPLICATION_SERVER_URL is not configured, use default value from OpenVidu Local deployment

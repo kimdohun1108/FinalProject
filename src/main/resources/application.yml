@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:6443}
+  port: ${SERVER_PORT:6080}
   ssl:
     enabled: false
     

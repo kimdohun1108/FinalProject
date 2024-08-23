@@ -10,7 +10,7 @@ import "./App.css";
 import { useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
-import { LiveKitRoom } from "@livekit/components-react";
+//import { LiveKitRoom } from "@livekit/components-react";
 //import { ControlBar } from "@livekit/components-react";
 
 // 로컬 개발을 위한 기본값 설정
@@ -143,7 +143,7 @@ function App() {
     }
 
     return (
-        <LiveKitRoom>
+        <>
             {!room ? (
                 <div id="join">
                     <div id="join-dialog">
@@ -217,7 +217,7 @@ function App() {
                     {/* <ControlBar variation={"minimal"} /> */}
                 </div>
             )}
-        </LiveKitRoom>
+        </>
     );
 }
 

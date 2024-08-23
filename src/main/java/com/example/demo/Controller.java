@@ -16,7 +16,7 @@ import io.livekit.server.RoomName;
 import io.livekit.server.WebhookReceiver;
 import livekit.LivekitWebhook.WebhookEvent;
 
-@CrossOrigin(origins = "*") 
+@CrossOrigin(origins = "http://223.130.139.215:3000") 
 @RestController
 public class Controller {
 

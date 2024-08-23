@@ -10,6 +10,8 @@ import "./App.css";
 import { useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
+import { LiveKitRoom } from "@livekit/components-react";
+import { ControlBar } from "@livekit/components-react";
 
 // 로컬 개발을 위한 기본값 설정
 // 프로덕션에서는 배포에 따라 올바른 URL을 구성해야 합니다
@@ -141,7 +143,7 @@ function App() {
     }
 
     return (
-        <>
+        <LiveKitRoom>
             {!room ? (
                 <div id="join">
                     <div id="join-dialog">
@@ -212,9 +214,10 @@ function App() {
                             )
                         )}
                     </div>
+                    <ControlBar />
                 </div>
             )}
-        </>
+        </LiveKitRoom>
     );
 }
 

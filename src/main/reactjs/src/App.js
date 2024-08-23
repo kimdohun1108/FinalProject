@@ -213,7 +213,7 @@ function App() {
                             )
                         )}
                     </div>
-                    <ControlBar />
+                    <ControlBar  leaveRoom={leaveRoom} />
                 </div>
             )}
         </>

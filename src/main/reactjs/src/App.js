@@ -21,7 +21,7 @@ configureUrls();
 function configureUrls() {
     // 로컬 개발을 위한 URL 구성
     // 프로덕션을 위한 URL 구성
-    APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr:80/";
+    APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr:3000/";
     LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
 }
 

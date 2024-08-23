@@ -214,6 +214,7 @@ function App() {
                             )
                         )}
                     </div>
+                    <ControlBar />
                 </div>
             )}
         </LiveKitRoom>

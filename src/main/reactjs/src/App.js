@@ -214,7 +214,7 @@ function App() {
                             )
                         )}
                     </div>
-                    <ControlBar />
+                    <ControlBar leaveRoom={leaveRoom} toggleMic toggleCamera />
                 </div>
             )}
         </LiveKitRoom>

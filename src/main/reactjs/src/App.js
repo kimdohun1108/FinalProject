@@ -214,6 +214,7 @@ function App() {
                             )
                         )}
                     </div>
+                    <ControlBar variation={"minimal"} />
                 </div>
             )}
         </LiveKitRoom>

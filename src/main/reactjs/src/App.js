@@ -91,7 +91,7 @@ function App() {
             await leaveRoom();
         }
     }
-
+    //방 나가기
     async function leaveRoom() {
         // 'disconnect' 메서드를 호출하여 방에서 나가기
         await room?.disconnect();

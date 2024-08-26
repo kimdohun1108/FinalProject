@@ -7,9 +7,11 @@ import {
     RoomEvent
 } from "livekit-client";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
+import { Chat, ChatToggle, LayoutContextProvider } from "@livekit/components-react";
+import { LiveKitRoom } from "@livekit/components-react";
 
 
 // 로컬 개발을 위한 기본값 설정
@@ -43,9 +45,15 @@ function App() {
     const [room, setRoom] = useState(undefined);
     const [localTrack, setLocalTrack] = useState(undefined);
     const [remoteTracks, setRemoteTracks] = useState([]);
-
     const [participantName, setParticipantName] = useState("Participant" + Math.floor(Math.random() * 100));
     const [roomName, setRoomName] = useState("Test Room");
+    const [token, setToken] = useState(null);
+
+    useEffect(() => {
+        if (room && token) {
+            joinRoom();
+        }
+    }, [room, token]);
 
     async function joinRoom() {
         // 새 Room 객체 초기화
@@ -72,6 +80,8 @@ function App() {
         try {
             // 방 이름과 참가자 이름으로 애플리케이션 서버에서 토큰 가져오기
             const token = await getToken(roomName, participantName);
+            //
+            setToken(token);
 
             // LiveKit URL과 토큰으로 방에 연결
             await room.connect(LIVEKIT_URL, token);
@@ -127,7 +137,7 @@ function App() {
                     participantName: participantName
                 })
             });
-    
+            
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
@@ -142,7 +152,8 @@ function App() {
     }
 
     return (
-        <>
+        <LayoutContextProvider>
+        <LiveKitRoom token={token} serverUrl={LIVEKIT_URL} connect={!!token}>
             {!room ? (
                 <div id="join">
                     <div id="join-dialog">
@@ -193,7 +204,6 @@ function App() {
                             Leave Room
                         </button>
                     </div>
-                    {/* 비디오 */}
                     <div id="layout-container">
                         {localTrack && (
                             <VideoComponent track={localTrack} participantIdentity={participantName} local={true} />
@@ -213,9 +223,14 @@ function App() {
                             )
                         )}
                     </div>
+                    <div id="chat-container">
+                        <Chat />
+                        <ChatToggle />
+                    </div>
                 </div>
             )}
-        </>
+        </LiveKitRoom>
+        </LayoutContextProvider>
     );
 }
 

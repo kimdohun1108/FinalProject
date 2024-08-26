@@ -90,7 +90,7 @@ function App() {
             console.log("There was an error connecting to the room:", error.message);
             await leaveRoom();
         }
-    }, [roomName, participantName]);
+    }, [roomName, participantName, leaveRoom]);
 
     useEffect(() => {
         if (room && token) {
@@ -98,7 +98,7 @@ function App() {
         }
     }, [room, token, joinRoom]);
 
-    async function leaveRoom() {
+    const leaveRoom = useCallback(async () => {
         // 'disconnect' 메서드를 호출하여 방에서 나가기
         await room?.disconnect();
 
@@ -106,7 +106,7 @@ function App() {
         setRoom(undefined);
         setLocalTrack(undefined);
         setRemoteTracks([]);
-    }
+    }, [room]);
 
     // useEffect(() => {
     //     if (room && token) {

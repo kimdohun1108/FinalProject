@@ -91,10 +91,10 @@ const joinRoom = useCallback(async () => {
 }, [roomName, participantName, leaveRoom]);
 
 useEffect(() => {
-    if (room && token) {
+    if (token) {
         joinRoom();
     }
-}, [room, token, joinRoom]);
+}, [token, joinRoom]);
 
 async function getToken(roomName, participantName) {
     try {

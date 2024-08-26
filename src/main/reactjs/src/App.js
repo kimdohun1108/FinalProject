@@ -49,64 +49,78 @@ function App() {
     const [roomName, setRoomName] = useState("Test Room");
     const [token, setToken] = useState(null);
 
-    const joinRoom = useCallback(async () => {
-        // 새 Room 객체 초기화
-        const room = new Room();
-        setRoom(room);
+   // leaveRoom 함수가 변경될 때 joinRoom을 업데이트
+   const leaveRoom = useCallback(async () => {
+    await room?.disconnect();
+    setRoom(undefined);
+    setLocalTrack(undefined);
+    setRemoteTracks([]);
+}, [room]);
 
-        // Room에서 이벤트 발생 시 동작 지정
-        room.on(
-            RoomEvent.TrackSubscribed,
-            (_track, publication, participant) => {
-                setRemoteTracks((prev) => [
-                    ...prev,
-                    { trackPublication: publication, participantIdentity: participant.identity }
-                ]);
-            }
-        );
+// joinRoom 함수가 leaveRoom을 의존성으로 가짐
+const joinRoom = useCallback(async () => {
+    const room = new Room();
+    setRoom(room);
 
-        room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
-            setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
+    room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => {
+        setRemoteTracks((prev) => [
+            ...prev,
+            { trackPublication: publication, participantIdentity: participant.identity }
+        ]);
+    });
+
+    room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
+        setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
+    });
+
+    try {
+        const token = await getToken(roomName, participantName);
+        setToken(token);
+        await room.connect(LIVEKIT_URL, token);
+        await room.localParticipant.enableCameraAndMicrophone();
+        const localVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
+        if (localVideoTrack) {
+            setLocalTrack(localVideoTrack);
+        } else {
+            console.warn("No video track found for local participant.");
+        }
+    } catch (error) {
+        console.log("There was an error connecting to the room:", error.message);
+        await leaveRoom();
+    }
+}, [roomName, participantName, leaveRoom]);
+
+useEffect(() => {
+    if (room && token) {
+        joinRoom();
+    }
+}, [room, token, joinRoom]);
+
+async function getToken(roomName, participantName) {
+    try {
+        const response = await fetch(APPLICATION_SERVER_URL + "token", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                roomName: roomName,
+                participantName: participantName
+            })
         });
-
-        try {
-            // 방 이름과 참가자 이름으로 애플리케이션 서버에서 토큰 가져오기
-            const token = await getToken(roomName, participantName);
-            setToken(token);
-
-            // LiveKit URL과 토큰으로 방에 연결
-            await room.connect(LIVEKIT_URL, token);
-
-            // 카메라와 마이크 활성화
-            await room.localParticipant.enableCameraAndMicrophone();
-            // 로컬 비디오 트랙 가져오기
-            const localVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
-            if (localVideoTrack) {
-                setLocalTrack(localVideoTrack);
-            } else {
-                console.warn("No video track found for local participant.");
-            }
-        } catch (error) {
-            console.log("There was an error connecting to the room:", error.message);
-            await leaveRoom();
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
         }
-    }, [roomName, participantName, leaveRoom]);
 
-    useEffect(() => {
-        if (room && token) {
-            joinRoom();
-        }
-    }, [room, token, joinRoom]);
-
-    const leaveRoom = useCallback(async () => {
-        // 'disconnect' 메서드를 호출하여 방에서 나가기
-        await room?.disconnect();
-
-        // 상태 초기화
-        setRoom(undefined);
-        setLocalTrack(undefined);
-        setRemoteTracks([]);
-    }, [room]);
+        const data = await response.json();
+        return data.token;
+    } catch (error) {
+        console.error("토큰 가져오기 실패:", error);
+        throw error;
+    }
+}
 
     // useEffect(() => {
     //     if (room && token) {
@@ -184,32 +198,32 @@ function App() {
      * 애플리케이션 서버가 사용자 인증을 통해 엔드포인트 접근을 허용해야 합니다.
      */
 
-    async function getToken(roomName, participantName) {
-        try {
-            const response = await fetch(APPLICATION_SERVER_URL + "token", {
-                method: "POST",
-                //url: "http://localhost:6080",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    roomName: roomName,
-                    participantName: participantName
-                })
-            });
+    // async function getToken(roomName, participantName) {
+    //     try {
+    //         const response = await fetch(APPLICATION_SERVER_URL + "token", {
+    //             method: "POST",
+    //             //url: "http://localhost:6080",
+    //             headers: {
+    //                 "Content-Type": "application/json"
+    //             },
+    //             body: JSON.stringify({
+    //                 roomName: roomName,
+    //                 participantName: participantName
+    //             })
+    //         });
             
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
-            }
+    //         if (!response.ok) {
+    //             const error = await response.json();
+    //             throw new Error(`토큰 가져오기 실패: ${error.errorMessage}`);
+    //         }
     
-            const data = await response.json();
-            return data.token;
-        } catch (error) {
-            console.error("토큰 가져오기 실패:", error);
-            throw error;
-        }
-    }
+    //         const data = await response.json();
+    //         return data.token;
+    //     } catch (error) {
+    //         console.error("토큰 가져오기 실패:", error);
+    //         throw error;
+    //     }
+    // }
 
     return (
         <LayoutContextProvider>

@@ -59,17 +59,19 @@ function App() {
 
 // joinRoom 함수가 leaveRoom을 의존성으로 가짐
 const joinRoom = useCallback(async () => {
-    const room = new Room();
-    setRoom(room);
+    if (!token || room) return;
 
-    room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => {
+    const newRoom = new Room();
+    setRoom(newRoom);
+
+    newRoom.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => {
         setRemoteTracks((prev) => [
             ...prev,
             { trackPublication: publication, participantIdentity: participant.identity }
         ]);
     });
 
-    room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
+    newRoom.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
         setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
     });
 
@@ -88,13 +90,13 @@ const joinRoom = useCallback(async () => {
         console.log("There was an error connecting to the room:", error.message);
         await leaveRoom();
     }
-}, [roomName, participantName, leaveRoom]);
+}, [roomName, participantName, leaveRoom, token]);
 
 useEffect(() => {
     if (token) {
         joinRoom();
     }
-}, [token, joinRoom]);
+}, [token, room, joinRoom]);
 
 async function getToken(roomName, participantName) {
     try {

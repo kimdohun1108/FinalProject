@@ -10,8 +10,9 @@ import "./App.css";
 import { useCallback, useEffect, useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
-import { Chat, ChatToggle, LayoutContextProvider } from "@livekit/components-react";
+import { ChatToggle, LayoutContextProvider } from "@livekit/components-react";
 import { LiveKitRoom } from "@livekit/components-react";
+import Chat from "./components/Chat";
 
 
 // 로컬 개발을 위한 기본값 설정
@@ -48,12 +49,6 @@ function App() {
     const [participantName, setParticipantName] = useState("Participant" + Math.floor(Math.random() * 100));
     const [roomName, setRoomName] = useState("Test Room");
     const [token, setToken] = useState(null);
-
-    // useEffect(() => {
-    //     if (room && token) {
-    //         joinRoom();
-    //     }
-    // }, [room, token]);
 
     async function joinRoom() {
         // 새 Room 객체 초기화
@@ -153,7 +148,7 @@ function App() {
     }
 
     return (
-        <LayoutContextProvider>
+        // <LayoutContextProvider>
         <LiveKitRoom> 
             {/* token={token} serverUrl={LIVEKIT_URL} connect={!!token} */}
             {!room ? (
@@ -227,12 +222,11 @@ function App() {
                     </div>
                     <div id="chat-container">
                         <Chat />
-                        <ChatToggle />
                     </div>
                 </div>
             )}
         </LiveKitRoom>
-        </LayoutContextProvider>
+        // </LayoutContextProvider> 
     );
 }
 

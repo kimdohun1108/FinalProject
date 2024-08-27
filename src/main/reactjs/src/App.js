@@ -50,22 +50,13 @@ function App() {
     const [roomName, setRoomName] = useState("Test Room");
     const [token, setToken] = useState(null);
 
-    const leaveRoom = useCallback(async () => {
-        // 'disconnect' 메서드를 호출하여 방에서 나가기
-        await room?.disconnect();
-
-        // 상태 초기화
-        setRoom(undefined);
-        setLocalTrack(undefined);
-        setRemoteTracks([]);
-    }, [room]);
-
-    const joinRoom = useCallback(async () => {
+    async function joinRoom() {
         // 새 Room 객체 초기화
         const room = new Room();
         setRoom(room);
 
         // Room에서 이벤트 발생 시 동작 지정
+        // 새로운 Track을 받을 때...
         room.on(
             RoomEvent.TrackSubscribed,
             (_track, publication, participant) => {
@@ -76,6 +67,7 @@ function App() {
             }
         );
 
+         // Track이 삭제될 때...
         room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
             setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
         });
@@ -83,6 +75,7 @@ function App() {
         try {
             // 방 이름과 참가자 이름으로 애플리케이션 서버에서 토큰 가져오기
             const token = await getToken(roomName, participantName);
+            //
             setToken(token);
 
             // LiveKit URL과 토큰으로 방에 연결
@@ -90,9 +83,11 @@ function App() {
 
             // 카메라와 마이크 활성화
             await room.localParticipant.enableCameraAndMicrophone();
-            const localVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
-            if (localVideoTrack) {
-                setLocalTrack(localVideoTrack);
+            // 로컬 비디오 트랙 가져오기
+            //setLocalTrack(room.localParticipant.videoTrackPublications.values().next().value.videoTrack);
+            const LocalVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
+            if (LocalVideoTrack) {
+                setLocalTrack(LocalVideoTrack);
             } else {
                 console.warn("No video track found for local participant.");
             }
@@ -100,72 +95,18 @@ function App() {
             console.log("There was an error connecting to the room:", error.message);
             await leaveRoom();
         }
-    }, [roomName, participantName, leaveRoom]);
+    }
 
-    useEffect(() => {
-        return () => {
-            // 컴포넌트가 언마운트될 때 방에서 나가기
-            leaveRoom();
-        };
-    }, [leaveRoom]);
+    //방 나가기
+    async function leaveRoom() {
+        // 'disconnect' 메서드를 호출하여 방에서 나가기
+        await room?.disconnect();
 
-    // async function joinRoom() {
-    //     // 새 Room 객체 초기화
-    //     const room = new Room();
-    //     setRoom(room);
-
-    //     // Room에서 이벤트 발생 시 동작 지정
-    //     // 새로운 Track을 받을 때...
-    //     room.on(
-    //         RoomEvent.TrackSubscribed,
-    //         (_track, publication, participant) => {
-    //             setRemoteTracks((prev) => [
-    //                 ...prev,
-    //                 { trackPublication: publication, participantIdentity: participant.identity }
-    //             ]);
-    //         }
-    //     );
-
-    //      // Track이 삭제될 때...
-    //     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
-    //         setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
-    //     });
-
-    //     try {
-    //         // 방 이름과 참가자 이름으로 애플리케이션 서버에서 토큰 가져오기
-    //         const token = await getToken(roomName, participantName);
-    //         //
-    //         setToken(token);
-
-    //         // LiveKit URL과 토큰으로 방에 연결
-    //         await room.connect(LIVEKIT_URL, token);
-
-    //         // 카메라와 마이크 활성화
-    //         await room.localParticipant.enableCameraAndMicrophone();
-    //         // 로컬 비디오 트랙 가져오기
-    //         //setLocalTrack(room.localParticipant.videoTrackPublications.values().next().value.videoTrack);
-    //         const LocalVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
-    //         if (LocalVideoTrack) {
-    //             setLocalTrack(LocalVideoTrack);
-    //         } else {
-    //             console.warn("No video track found for local participant.");
-    //         }
-    //     } catch (error) {
-    //         console.log("There was an error connecting to the room:", error.message);
-    //         await leaveRoom();
-    //     }
-    // }
-
-    // //방 나가기
-    // async function leaveRoom() {
-    //     // 'disconnect' 메서드를 호출하여 방에서 나가기
-    //     await room?.disconnect();
-
-    //     // 상태 초기화
-    //     setRoom(undefined);
-    //     setLocalTrack(undefined);
-    //     setRemoteTracks([]);
-    // }
+        // 상태 초기화
+        setRoom(undefined);
+        setLocalTrack(undefined);
+        setRemoteTracks([]);
+    }
 
     /**
      * --------------------------------------------

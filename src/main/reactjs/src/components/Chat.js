@@ -7,14 +7,13 @@ function Chat() {
 
     const handleSendMessage = (e) => {
         e.preventDefault();
-        if (message.trim() !== '') {
-            send(message); // 메시지를 전송합니다.
-            setMessage(''); // 입력 필드를 비웁니다.
+        if (message.trim()) {
+            send(message);
+            setMessage('');
         }
     };
 
     useEffect(() => {
-        // 채팅 메시지가 새로 추가될 때마다 스크롤을 아래로 이동합니다.
         const chatContainer = document.getElementById('chat-messages');
         if (chatContainer) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -25,8 +24,8 @@ function Chat() {
         <div className="chat-container">
             <div id="chat-messages" className="chat-messages">
                 {chatMessages.map((msg, index) => (
-                    <div key={index} className="chat-message">
-                        <strong>{msg.senderName}: </strong>
+                    <div key={msg.id || index} className="chat-message">
+                        <strong>{msg.senderName || 'Unknown'}: </strong>
                         <span>{msg.message}</span>
                     </div>
                 ))}

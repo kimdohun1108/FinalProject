@@ -90,7 +90,7 @@ function App() {
             console.log("There was an error connecting to the room:", error.message);
             await leaveRoom();
         }
-    }, [roomName, participantName]);
+    }, [roomName, participantName, leaveRoom]);
 
     const leaveRoom = useCallback(async () => {
         // 'disconnect' 메서드를 호출하여 방에서 나가기

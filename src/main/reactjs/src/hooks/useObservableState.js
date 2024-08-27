@@ -20,7 +20,7 @@ export function useObservableState(
 
     const subscription = observable.subscribe(setState);
     return () => subscription.unsubscribe();
-  }, [observable, resetWhenObservableChanges]);
+  }, [observable, resetWhenObservableChanges, startWith]);
 
   return state;
 }

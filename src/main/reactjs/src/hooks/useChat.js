@@ -39,7 +39,7 @@ export function useChat(options) {
     }
     // room 정보가 있다면 정상적으로 setupChat 함수를 호출해 채팅을 설정
     return setupChat(room, options);
-  }, [room, options, isDisconnected]);
+  }, [room, options]);
 
   // 메시지를 전송 중인지 여부를 관리하는 상태
   const isSending = useObservableState(setup.isSendingObservable, false);

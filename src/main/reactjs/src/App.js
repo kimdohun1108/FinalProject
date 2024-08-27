@@ -10,9 +10,8 @@ import "./App.css";
 import { useCallback, useEffect, useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
-import { ChatToggle, LayoutContextProvider } from "@livekit/components-react";
-import { LiveKitRoom } from "@livekit/components-react";
-import Chat from "./components/Chat";
+import { ChatEntry, LayoutContextProvider } from "@livekit/components-react";
+import { LiveKitRoom, Chat } from "@livekit/components-react";
 
 
 // 로컬 개발을 위한 기본값 설정
@@ -149,7 +148,7 @@ function App() {
 
     return (
         <LayoutContextProvider>
-        <LiveKitRoom token={token} serverUrl={LIVEKIT_URL} connect={!!token}> 
+        <LiveKitRoom> 
             {/* token={token} serverUrl={LIVEKIT_URL} connect={!!token} */}
             {!room ? (
                 <div id="join">
@@ -221,7 +220,8 @@ function App() {
                         )}
                     </div>
                     <div id="chat-container">
-                        <Chat />
+                        <Chat>
+                        </Chat>
                     </div>
                 </div>
             )}

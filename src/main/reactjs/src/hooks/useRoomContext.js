@@ -5,7 +5,7 @@ import * as React from 'react'; // React 라이브러리를 임포트
  * 초기값은 undefined로 설정되어 있습니다.
  * @public
  */
-export const RoomContext = React.createContext(undefined);
+export const RoomContext = React.createContext(null);
 
 /**
  * 이 훅은 RoomContext를 통해 제공된 Room 객체를 반환합니다.

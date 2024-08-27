@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@livekit/components-core": "^0.11.2",
     "@livekit/components-react": "^2.4.3",
     "@livekit/components-styles": "^1.0.12",
     "@testing-library/jest-dom": "^5.17.0",

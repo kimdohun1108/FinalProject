@@ -148,8 +148,8 @@ function App() {
     }
 
     return (
-        // <LayoutContextProvider>
-        <LiveKitRoom> 
+        <LayoutContextProvider>
+        <LiveKitRoom token={token} serverUrl={LIVEKIT_URL} connect={!!token}> 
             {/* token={token} serverUrl={LIVEKIT_URL} connect={!!token} */}
             {!room ? (
                 <div id="join">
@@ -226,7 +226,7 @@ function App() {
                 </div>
             )}
         </LiveKitRoom>
-        // </LayoutContextProvider> 
+        </LayoutContextProvider> 
     );
 }
 

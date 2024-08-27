@@ -25,7 +25,7 @@ function Chat() {
             <div id="chat-messages" className="chat-messages">
                 {chatMessages.map((msg, index) => (
                     <div key={msg.id || index} className="chat-message">
-                        <strong>{msg.senderName || 'Unknown'}: </strong>
+                        <strong>{msg.senderName || 'Unknown'}:</strong>
                         <span>{msg.message}</span>
                     </div>
                 ))}

@@ -50,6 +50,13 @@ function App() {
     const [roomName, setRoomName] = useState("Test Room");
     const [token, setToken] = useState(null);
 
+    useEffect(() => {
+        return () => {
+            // 컴포넌트가 언마운트될 때 방에서 나가기
+            leaveRoom();
+        };
+    }, []);
+
     async function joinRoom() {
         // 새 Room 객체 초기화
         const room = new Room();

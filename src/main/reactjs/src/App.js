@@ -50,6 +50,16 @@ function App() {
     const [roomName, setRoomName] = useState("Test Room");
     const [token, setToken] = useState(null);
 
+    const leaveRoom = useCallback(async () => {
+        // 'disconnect' 메서드를 호출하여 방에서 나가기
+        await room?.disconnect();
+
+        // 상태 초기화
+        setRoom(undefined);
+        setLocalTrack(undefined);
+        setRemoteTracks([]);
+    }, [room]);
+
     const joinRoom = useCallback(async () => {
         // 새 Room 객체 초기화
         const room = new Room();
@@ -80,9 +90,9 @@ function App() {
 
             // 카메라와 마이크 활성화
             await room.localParticipant.enableCameraAndMicrophone();
-            const LocalVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
-            if (LocalVideoTrack) {
-                setLocalTrack(LocalVideoTrack);
+            const localVideoTrack = room.localParticipant.videoTrackPublications.values().next().value?.videoTrack;
+            if (localVideoTrack) {
+                setLocalTrack(localVideoTrack);
             } else {
                 console.warn("No video track found for local participant.");
             }
@@ -91,16 +101,6 @@ function App() {
             await leaveRoom();
         }
     }, [roomName, participantName, leaveRoom]);
-
-    const leaveRoom = useCallback(async () => {
-        // 'disconnect' 메서드를 호출하여 방에서 나가기
-        await room?.disconnect();
-
-        // 상태 초기화
-        setRoom(undefined);
-        setLocalTrack(undefined);
-        setRemoteTracks([]);
-    }, [room]);
 
     useEffect(() => {
         return () => {

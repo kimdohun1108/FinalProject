@@ -25,7 +25,7 @@ public class WebsocketConfig implements WebMvcConfigurer, WebSocketConfigurer {
 	 @Override
 	 public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		 registry.addHandler(new ChatWebSocketHandler(), "/ws/chat")
-	             .setAllowedOrigins("http://localhost:3000") // React 앱 주소
+	             .setAllowedOrigins("http://223.130.139.215:3000") // React 앱 주소
 	             .addInterceptors(new HttpSessionHandshakeInterceptor());
 	 }	
 }

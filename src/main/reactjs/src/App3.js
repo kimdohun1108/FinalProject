@@ -268,7 +268,7 @@ function App() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://223.130.139.215:6080/ws/chat');
+    const ws = new WebSocket('wss://223.130.139.215:6080/ws/chat');
     
     ws.onopen = () => {
       console.log('웹소켓 연결이 설정되었습니다.');

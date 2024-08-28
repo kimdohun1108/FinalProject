@@ -292,7 +292,7 @@ function App() {
     return () => {
         ws.close();
     };
-    }, []);
+    }, [participantName]);
 
   const sendMessage = (e) => {
     e.preventDefault();

@@ -21,26 +21,26 @@ let APPLICATION_SERVER_URL = "";
 let LIVEKIT_URL = "";
 configureUrls();
 
-// function configureUrls() {
-//     // 로컬 개발을 위한 URL 구성
-//     // 프로덕션을 위한 URL 구성
-//     APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
-//     LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
-// }
+function configureUrls() {
+    // 로컬 개발을 위한 URL 구성
+    // 프로덕션을 위한 URL 구성
+    APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
+    LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
+}
 
 // 로컬이면 6080 http, 배포면 6443 https,
 
-function configureUrls() {
-    if (!APPLICATION_SERVER_URL) {
-        if (window.location.hostname === "localhost") {
-            APPLICATION_SERVER_URL = "http://localhost:6080/";
-        } else {
-            APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
-        }
-    }
+// function configureUrls() {
+//     if (!APPLICATION_SERVER_URL) {
+//         if (window.location.hostname === "localhost") {
+//             APPLICATION_SERVER_URL = "http://localhost:6080/";
+//         } else {
+//             APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
+//         }
+//     }
 
-    LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
-}
+//     LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
+// }
 
 function App() {
     const [room, setRoom] = useState(undefined);
@@ -262,6 +262,50 @@ function App() {
         setIsScreenSharing(!isScreenSharing);
     }
 
+    //채팅
+    const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:6080/ws/chat');
+    
+    ws.onopen = () => {
+      console.log('웹소켓 연결이 설정되었습니다.');
+    };
+
+    ws.onmessage = (event) => {
+      console.log('메시지 수신됨:', event.data);
+      setMessages((prevMessages) => [...prevMessages, `${participantName} : ${event.data}`]);
+    };
+  
+    ws.onclose = () => {
+      console.log('웹소켓 연결이 종료되었습니다.');
+    };
+  
+    ws.onerror = (error) => {
+      console.error('웹소켓 오류 발생:', error);
+    };
+
+    setSocket(ws);
+    
+    return () => {
+        ws.close();
+    };
+    }, []);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (socket && message) {
+      socket.send(message);
+      //setMessages((prevMessages) => [...prevMessages, `나: ${message}`]); // 나의 메시지를 화면에 추가
+      setMessage(''); // 메시지 입력란 비우기
+    }
+    else {
+      console.warn('소켓이 열려 있지 않거나 메시지가 비어 있습니다.');
+    }
+  };
+
     return (
         <LayoutContextProvider>
         <LiveKitRoom> 
@@ -352,6 +396,22 @@ function App() {
                     <button className="btn btn-secondary" onClick={toggleScreenSharing}>
                         {isScreenSharing ? "화면 공유 중지" : "화면 공유"}
                     </button>
+                    <div className="chat-container">
+                        <ul id="messages">
+                        {messages.map((msg, index) => (
+                            <li key={index}>{msg}</li>
+                        ))}
+                        </ul>
+                        <form onSubmit={sendMessage}>
+                        <input
+                            autoComplete="off"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="메시지를 입력하세요"
+                        />
+                        <button type="submit">Send</button>
+                        </form>
+                    </div>
                 </div>
             )}
         </LiveKitRoom>

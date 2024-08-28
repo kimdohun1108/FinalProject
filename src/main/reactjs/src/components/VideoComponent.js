@@ -7,11 +7,25 @@ function VideoComponent({ track, participantIdentity, local = false }) {
 
     useEffect(() => {
         if (videoElement.current) {
-            track.attach(videoElement.current);
+            //track.attach(videoElement.current);
+            if (track instanceof MediaStreamTrack) {
+                // MediaStreamTrack을 사용하는 경우
+                videoElement.current.srcObject = new MediaStream([track]);
+            } else if (track.attach) {
+                // LiveKit 트랙을 사용하는 경우
+                track.attach(videoElement.current);
+            }
         }
 
         return () => {
-            track.detach();
+            //track.detach();
+            if (track instanceof MediaStreamTrack) {
+                // MediaStreamTrack을 사용하는 경우
+                //videoElement.current.srcObject = null;
+            } else if (track.detach) {
+                // LiveKit 트랙을 사용하는 경우
+                track.detach();
+            }
         };
     }, [track]);
 
@@ -20,7 +34,8 @@ function VideoComponent({ track, participantIdentity, local = false }) {
             <div className="participant-data">
                 <p>{participantIdentity + (local ? " (You)" : "")}</p>
             </div>
-            <video ref={videoElement} id={track.sid}></video>
+            {/* <video ref={videoElement} id={track.sid}></video> */}
+            <video ref={videoElement} autoPlay playsInline muted={local}></video>
         </div>
     );
 }

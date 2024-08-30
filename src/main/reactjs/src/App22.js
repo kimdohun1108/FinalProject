@@ -6,7 +6,7 @@ function App() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://openvidu.quizver.kro.kr/ws/chat');
+    const ws = new WebSocket('wss://openvidu.quizver.kro.kr/ws/chat');
     
     ws.onopen = () => {
       console.log('웹소켓 연결이 설정되었습니다.');
@@ -22,7 +22,8 @@ function App() {
     };
   
     ws.onerror = (error) => {
-      console.error('웹소켓 오류 발생:', error);
+      console.error('Error message:', error.message);
+      console.error('Stack trace:', error.stack);
     };
 
     setSocket(ws);

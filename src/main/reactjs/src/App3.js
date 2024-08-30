@@ -300,13 +300,13 @@ function App() {
     const sendMessage = (e) => {
         e.preventDefault();
         if (socket && message) {
-            let sending = participantName + "#$%#$" + message;
-        socket.send(sending);
-        //setMessages((prevMessages) => [...prevMessages, `나: ${message}`]); // 나의 메시지를 화면에 추가
-        setMessage(''); // 메시지 입력란 비우기
+            let sending = participantName + "#$%$#" + message;
+            socket.send(sending);
+            //setMessages((prevMessages) => [...prevMessages, `나: ${message}`]); // 나의 메시지를 화면에 추가
+            setMessage(''); // 메시지 입력란 비우기
         }
         else {
-        console.warn('소켓이 열려 있지 않거나 메시지가 비어 있습니다.');
+            console.warn('소켓이 열려 있지 않거나 메시지가 비어 있습니다.');
         }
     };
 

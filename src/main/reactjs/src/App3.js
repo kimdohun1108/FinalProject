@@ -277,7 +277,9 @@ function App() {
 
         ws.onmessage = (event) => {
         console.log('메시지 수신됨:', event.data);
-        setMessages((prevMessages) => [...prevMessages, `${participantName} : ${event.data}`]);
+        let sender = event.data.split('#$%$#')[0];
+        let msg = event.data.split('#$%$#')[1]
+        setMessages((prevMessages) => [...prevMessages, `${sender} : ${msg}`]);
         };
     
         ws.onclose = () => {
@@ -298,7 +300,8 @@ function App() {
     const sendMessage = (e) => {
         e.preventDefault();
         if (socket && message) {
-        socket.send(message);
+            let sending = participantName + "#$%#$" + message;
+        socket.send(sending);
         //setMessages((prevMessages) => [...prevMessages, `나: ${message}`]); // 나의 메시지를 화면에 추가
         setMessage(''); // 메시지 입력란 비우기
         }

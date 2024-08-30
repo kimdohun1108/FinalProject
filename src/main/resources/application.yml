@@ -1,7 +1,7 @@
 server:
   port: ${SERVER_PORT:6080}
   ssl:
-    enabled: false
+    enabled: true
     
 # LiveKit configuration
 livekit:

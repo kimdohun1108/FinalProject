@@ -267,9 +267,9 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
 
-    //wss://openvidu.quizver.kro.kr/ws/chat
+    // wss://localhost:5080/ws/chat
     useEffect(() => {
-        const ws = new WebSocket('wss://openvidu.quizver.kro.kr/');
+        const ws = new WebSocket('wss://openvidu.quizver.kro.kr/ws/chat');
         
         ws.onopen = () => {
         console.log('웹소켓 연결이 설정되었습니다.');

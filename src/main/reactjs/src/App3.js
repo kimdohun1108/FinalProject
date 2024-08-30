@@ -269,7 +269,7 @@ function App() {
 
     // wss://localhost:6080/ws/chat
     useEffect(() => {
-        const ws = new WebSocket('wss://openvidu.quizver.kro.kr/ws/chat');
+        const ws = new WebSocket('https://openvidu.quizver.kro.kr/ws/chat');
         
         ws.onopen = () => {
         console.log('웹소켓 연결이 설정되었습니다.');

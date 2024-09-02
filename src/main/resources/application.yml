@@ -1,11 +1,11 @@
 server:
-  port: ${SERVER_PORT:6080}
+  port: 6080
   ssl:
     enabled: false
     
 # LiveKit configuration
 livekit:
   api:
-    key: ${LIVEKIT_API_KEY:APIgu2Y3jMW8rUD}
-    secret: ${LIVEKIT_API_SECRET:j4aEwDCtZejT2d5s8d9HprQtinKDFMoHkQhOxPjRegN}
+    key: ${LIVEKIT_API_KEY:APINhUtuM6oBWvX}
+    secret: ${LIVEKIT_API_SECRET:IxhqRNQBYBw5PfimyPHenJ2j9EMP2DNNof6DNXcGVyvB}
     

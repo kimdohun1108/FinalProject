@@ -8,9 +8,10 @@ import {
     RoomEvent
 } from "livekit-client";
 import "./App.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import VideoComponent from "./components/VideoComponent";
 import AudioComponent from "./components/AudioComponent";
+import ShareVideoComponent from "./components/ShareVideoComponent";
 import { LiveKitRoom, LayoutContextProvider } from "@livekit/components-react";
 
 
@@ -21,26 +22,26 @@ let APPLICATION_SERVER_URL = "";
 let LIVEKIT_URL = "";
 configureUrls();
 
-function configureUrls() {
-    // 로컬 개발을 위한 URL 구성
-    // 프로덕션을 위한 URL 구성
-    APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
-    LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
-}
+// function configureUrls() {
+//     // 로컬 개발을 위한 URL 구성
+//     // 프로덕션을 위한 URL 구성
+//     APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
+//     LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
+// }
 
 // 로컬이면 6080 http, 배포면 6443 https,
 
-// function configureUrls() {
-//     if (!APPLICATION_SERVER_URL) {
-//         if (window.location.hostname === "localhost") {
-//             APPLICATION_SERVER_URL = "http://localhost:6080/";
-//         } else {
-//             APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
-//         }
-//     }
+function configureUrls() {
+    if (!APPLICATION_SERVER_URL) {
+        if (window.location.hostname === "localhost") {
+            APPLICATION_SERVER_URL = "http://localhost:6080/";
+        } else {
+            APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
+        }
+    }
 
-//     LIVEKIT_URL = "wss://openvidu.quizverse.kro.kr/";
-// }
+    LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
+}
 
 function App() {
     const [room, setRoom] = useState(undefined);
@@ -54,6 +55,7 @@ function App() {
     const [isMicrophoneEnabled, setIsMicrophoneEnabled] = useState(true);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [screenTrack, setScreenTrack] = useState(null);
+    const [sharedScreenTrackSid, setSharedScreenTrackSid] = useState(null);
     
     
     async function joinRoom() {
@@ -76,6 +78,16 @@ function App() {
          // Track이 삭제될 때...
         room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
             setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
+        });
+
+        ////////////////////////////////////////////////
+        room.on(RoomEvent.TrackPublished, (publication) => {
+            if (publication.kind === "video" && publication.track) {
+                setRemoteTracks((prev) => [
+                    ...prev,
+                    { trackPublication: publication, participantIdentity: room.remoteParticipants[0]?.identity } // 단일 참가자의 경우
+                ]);
+            }
         });
 
         try {
@@ -243,23 +255,42 @@ function App() {
             await enableMicrophone();
         }
     }
-    //화면공유
+    
+    // 화면 공유
     async function toggleScreenSharing() {
-        if (isScreenSharing) {
-            //화면 공유 중지
-            if (screenTrack) {
-                await screenTrack.stop();
-                room.localParticipant.unpublishTrack(screenTrack);
-                setScreenTrack(null);
+        try {
+            if (isScreenSharing) {
+                // 화면 공유 중지
+                if (screenTrack) {
+                    try {
+                        await screenTrack.stop();
+                        room.localParticipant.unpublishTrack(screenTrack);
+                        setScreenTrack(null);
+                        setSharedScreenTrackSid(null); // 화면 공유 중지 시, 식별자도 초기화
+                    } catch (error) {
+                        console.error("화면 공유 중지 중 에러 발생:", error);
+                        alert("화면 공유를 중지하는 동안 문제가 발생했습니다.");
+                    }
+                }
+            } else {
+                // 화면 공유 시작
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                    const track = stream.getVideoTracks()[0];
+                    setScreenTrack(track);
+                    await room.localParticipant.publishTrack(track);
+                    setSharedScreenTrackSid(track.id); // 화면 공유 시, 고유 식별자 설정
+                } catch (error) {
+                    console.error("화면 공유 시작 중 에러 발생:", error);
+                    alert("화면 공유를 시작하는 동안 문제가 발생했습니다. 권한을 허용했는지 확인하세요.");
+                }
             }
-        } else {
-            //화면 공유 
-            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-            const track = stream.getVideoTracks()[0];
-            setScreenTrack(track);
-            await room.localParticipant.publishTrack(track);
+            // 화면 공유 상태 토글
+            setIsScreenSharing(!isScreenSharing);
+        } catch (error) {
+            console.error("화면 공유 토글 중 에러 발생:", error);
+            alert("화면 공유 상태를 변경하는 동안 문제가 발생했습니다.");
         }
-        setIsScreenSharing(!isScreenSharing);
     }
 
     //채팅
@@ -267,9 +298,9 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
 
-    // wss://localhost:6080/ws/chat
     useEffect(() => {
-        const ws = new WebSocket('wss://openvidu.quizver.kro.kr/ws/chat');
+        //const ws = new WebSocket('wss://openvidu.quizver.kro.kr/ws/chat');
+        const ws = new WebSocket('ws://localhost:6080/ws/chat');
         
         ws.onopen = () => {
         console.log('웹소켓 연결이 설정되었습니다.');
@@ -362,11 +393,68 @@ function App() {
                             Leave Room
                         </button>
                     </div>
+                    <div id="layout-container-share">
+                        {/* 화면 공유 비디오 표시 */}
+                        {isScreenSharing && screenTrack && (
+                            <ShareVideoComponent
+                                track={screenTrack} // 화면 공유 비디오 트랙
+                                participantIdentity={participantName} // 화면 공유를 나타내는 고유 이름
+                                local={true}
+                                isScreenShare={true} // 화면 공유를 나타내는 속성 추가
+                            />
+                        )}
+                        {/* 원격 화면 공유 비디오 트랙을 추가로 렌더링 */}
+                        {/* {remoteTracks
+                            .filter(remoteTrack => remoteTrack.trackPublication.kind === "video" &&
+                                remoteTrack.trackPublication.videoTrack?.track?.kind === "video" &&
+                                remoteTrack.trackPublication.trackSid !== sharedScreenTrackSid)
+                            .map(remoteTrack => (
+                                <ShareVideoComponent
+                                    key={remoteTrack.trackPublication.trackSid}
+                                    track={remoteTrack.trackPublication.videoTrack}
+                                    participantIdentity={remoteTrack.participantIdentity}
+                                />
+                            ))
+                        } */}
+                        {!isScreenSharing && remoteTracks
+                        .filter(remoteTrack => remoteTrack.trackPublication.kind === "video" &&
+                            remoteTrack.trackPublication.trackSid === sharedScreenTrackSid
+                        ) 
+                        .map(remoteTrack => (
+                            <ShareVideoComponent
+                                key={remoteTrack.trackPublication.trackSid}
+                                track={remoteTrack.trackPublication.videoTrack}
+                                participantIdentity={remoteTrack.participantIdentity}
+                                isScreenShare={true} // 화면 공유로 설정
+                            />
+                        ))
+                    }
+                    </div>
                     <div id="layout-container">
                         {localTrack && (
                             <VideoComponent track={localTrack} participantIdentity={participantName} local={true} />
                         )}
-                        {remoteTracks.map((remoteTrack) =>
+                        {/* 일반 비디오 및 오디오 트랙 렌더링 */}
+                        {/* {remoteTracks
+                            .filter(remoteTrack => remoteTrack.trackPublication.trackSid !== sharedScreenTrackSid)
+                            .map(remoteTrack =>
+                                remoteTrack.trackPublication.kind === "video" ? (
+                                    <VideoComponent
+                                        key={remoteTrack.trackPublication.trackSid}
+                                        track={remoteTrack.trackPublication.videoTrack}
+                                        participantIdentity={remoteTrack.participantIdentity}
+                                    />
+                                ) : (
+                                    <AudioComponent
+                                        key={remoteTrack.trackPublication.trackSid}
+                                        track={remoteTrack.trackPublication.audioTrack}
+                                    />
+                                )
+                            )
+                        } */}
+                        {remoteTracks
+                        .filter(remoteTrack => remoteTrack.trackPublication.kind === "video") 
+                        .map(remoteTrack =>
                             remoteTrack.trackPublication.kind === "video" ? (
                                 <VideoComponent
                                     key={remoteTrack.trackPublication.trackSid}
@@ -379,15 +467,8 @@ function App() {
                                     track={remoteTrack.trackPublication.audioTrack}
                                 />
                             )
-                        )}
-                        {/* 화면 공유 비디오 표시 */}
-                        {isScreenSharing && screenTrack && (
-                            <VideoComponent
-                                track={screenTrack} // 화면 공유 비디오 트랙
-                                participantIdentity={participantName} // 화면 공유를 나타내는 고유 이름
-                                local={true}
-                            />
-                        )}
+                        )
+                    }
                     </div>
                     <button className="btn btn-secondary" onClick={toggleCamera}>
                         {isCameraEnabled ? "카메라 끄기" : "카메라 켜기"}

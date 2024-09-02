@@ -43,7 +43,7 @@ tasks.named('test') {
 
 /// 추가 부분 시작(맨 윗줄 1개 제외)
 // React build 설정
-def reactAppDir = "$projectDir/src/main/reactjs"
+def reactAppDir = "$projectDir/src/main/reactjs"	
 /*
 sourceSets {
   main {

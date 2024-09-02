@@ -16,8 +16,8 @@ import io.livekit.server.RoomName;
 import io.livekit.server.WebhookReceiver;
 import livekit.LivekitWebhook.WebhookEvent;
 
-//@CrossOrigin(origins = "http://localhost:3000") 
-@CrossOrigin(origins = "https://openvidu.openvidu.kro.kr") 
+@CrossOrigin(origins = "http://localhost:3000") 
+//@CrossOrigin(origins = "https://openvidu.quizver.kro.kr") 
 @RestController
 public class Controller {
 

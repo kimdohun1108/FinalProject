@@ -21,7 +21,7 @@ function ShareVideoComponent({ track, participantIdentity, local = false, isScre
             //track.detach();
             if (track instanceof MediaStreamTrack) {
                 // MediaStreamTrack을 사용하는 경우
-                videoElement.current.srcObject = null;
+                //videoElement.current.srcObject = null;
             } else if (track.detach) {
                 // LiveKit 트랙을 사용하는 경우
                 track.detach();

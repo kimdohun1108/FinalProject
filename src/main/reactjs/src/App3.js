@@ -22,26 +22,26 @@ let APPLICATION_SERVER_URL = "";
 let LIVEKIT_URL = "";
 configureUrls();
 
-// function configureUrls() {
-//     // 로컬 개발을 위한 URL 구성
-//     // 프로덕션을 위한 URL 구성
-//     APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
-//     LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
-// }
+function configureUrls() {
+    // 로컬 개발을 위한 URL 구성
+    // 프로덕션을 위한 URL 구성
+    APPLICATION_SERVER_URL = "https://openvidu.quizver.kro.kr/";
+    LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
+}
 
 // 로컬이면 6080 http, 배포면 6443 https,
 
-function configureUrls() {
-    if (!APPLICATION_SERVER_URL) {
-        if (window.location.hostname === "localhost") {
-            APPLICATION_SERVER_URL = "http://localhost:6080/";
-        } else {
-            APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
-        }
-    }
+// function configureUrls() {
+//     if (!APPLICATION_SERVER_URL) {
+//         if (window.location.hostname === "localhost") {
+//             APPLICATION_SERVER_URL = "http://localhost:6080/";
+//         } else {
+//             APPLICATION_SERVER_URL = "https://" + window.location.hostname + ":6443/";
+//         }
+//     }
 
-    LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
-}
+//     LIVEKIT_URL = "wss://openvidu.openvidu.kro.kr/";
+// }
 
 function App() {
     const [room, setRoom] = useState(undefined);
@@ -78,16 +78,6 @@ function App() {
          // Track이 삭제될 때...
         room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
             setRemoteTracks((prev) => prev.filter((track) => track.trackPublication.trackSid !== publication.trackSid));
-        });
-
-        ////////////////////////////////////////////////
-        room.on(RoomEvent.TrackPublished, (publication) => {
-            if (publication.kind === "video" && publication.track) {
-                setRemoteTracks((prev) => [
-                    ...prev,
-                    { trackPublication: publication, participantIdentity: room.remoteParticipants[0]?.identity } // 단일 참가자의 경우
-                ]);
-            }
         });
 
         try {
